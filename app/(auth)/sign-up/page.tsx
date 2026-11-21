@@ -1,14 +1,50 @@
 "use client";
 
-import React, { useState } from "react";
 import Link from "next/link";
-import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  LockKeyhole,
+  Mail,
+  UserRound,
+  Wrench,
+} from "lucide-react";
+import { toast } from "sonner";
 
-type Role = "customer" | "technician";
+import { Button } from "@/components/ui/button";
+import { clearApiTokenCache } from "@/lib/api";
+import { authClient } from "@/lib/auth-client";
+import { ROLE_DASHBOARD } from "@/lib/constants";
+import { isValidEmail, validatePassword } from "@/lib/validators";
+import type { Role } from "@/lib/types";
 
-const SignUpPage = () => {
+const inputClass =
+  "h-11 w-full rounded-xl border border-border bg-input px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground/80 focus:border-primary focus:ring-1 focus:ring-ring/40";
 
+const ROLES: Array<{
+  value: Extract<Role, "customer" | "technician">;
+  label: string;
+  description: string;
+  icon: typeof UserRound;
+}> = [
+  {
+    value: "customer",
+    label: "Customer",
+    description: "Book repairs and pay after completion",
+    icon: UserRound,
+  },
+  {
+    value: "technician",
+    label: "Technician",
+    description: "Publish services and manage repair jobs",
+    icon: Wrench,
+  },
+];
+
+export default function SignUpPage() {
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -16,325 +52,317 @@ const SignUpPage = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "customer" as Role,
+    role: "customer" as Extract<Role, "customer" | "technician">,
     phone: "",
     area: "",
     bio: "",
   });
-
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setError("");
 
-    if (form.password.length < 8) {
-      setError("Password must be at least 8 characters.");
+    if (form.name.trim().length < 2) {
+      setError("Please enter your full name.");
+      return;
+    }
+    if (!isValidEmail(form.email)) {
+      setError("Please enter a valid email address.");
       return;
     }
 
+    const passwordErrors = validatePassword(form.password);
+    if (passwordErrors.length > 0) {
+      setError(passwordErrors[0]);
+      return;
+    }
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
 
     setLoading(true);
-
     try {
-      const { error } = await authClient.signUp.email({
+      const { error: signUpError } = await authClient.signUp.email({
         name: form.name.trim(),
         email: form.email.trim().toLowerCase(),
         password: form.password,
         role: form.role,
-        phone: form.phone.trim(),
-        area: form.area.trim(),
+        phone: form.phone.trim() || undefined,
+        area: form.area.trim() || undefined,
         bio: form.bio.trim() || undefined,
       });
 
-      if (error) {
-        setError(error.message || "Failed to create account.");
+      if (signUpError) {
+        setError(signUpError.message || "Failed to create your account.");
         return;
       }
+
+      clearApiTokenCache();
+      toast.success("Account created", {
+        description:
+          form.role === "technician"
+            ? "Add your first service and wait for admin approval."
+            : "Browse services and send your first repair request.",
+      });
+      router.push(ROLE_DASHBOARD[form.role]);
+      router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
-      router.push("/");
     }
-  };
+  }
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-2xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-semibold tracking-tight">
-            Create your account
-          </h1>
+    <div className="w-full max-w-2xl">
+      <div className="mb-8 text-center">
+        <h1 className="font-heading text-3xl font-bold tracking-tight">
+          Create your FixMate account
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Join as a customer or technician — it takes less than a minute.
+        </p>
+      </div>
 
-          <p className="mt-2 text-sm text-muted-foreground">
-            Join Fixmate and get started
-          </p>
-        </div>
-
-        {/* Card */}
-        <div className="rounded-xl border border-border bg-card p-6 sm:p-8 shadow-xl">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Name */}
-            <div className="space-y-2">
-              <label
-                htmlFor="name"
-                className="text-sm font-medium"
-              >
-                Full Name
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.9)] sm:p-8">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label htmlFor="name" className="text-xs font-medium">
+                Full name
               </label>
-
               <input
                 id="name"
-                name="name"
-                type="text"
                 value={form.name}
-                onChange={handleChange}
-                placeholder="John Doe"
+                onChange={(event) =>
+                  setForm({ ...form, name: event.target.value })
+                }
+                placeholder="Nusrat Jahan"
+                autoComplete="name"
                 required
-                className="w-full rounded-lg border border-border bg-input px-4 py-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-ring"
+                className={inputClass}
               />
             </div>
 
-            {/* Email */}
-            <div className="space-y-2">
-              <label
-                htmlFor="email"
-                className="text-sm font-medium"
-              >
-                Email
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="text-xs font-medium">
+                Email address
               </label>
-
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                placeholder="you@example.com"
-                required
-                className="w-full rounded-lg border border-border bg-input px-4 py-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-ring"
-              />
+              <div className="relative">
+                <Mail className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  id="email"
+                  type="email"
+                  value={form.email}
+                  onChange={(event) =>
+                    setForm({ ...form, email: event.target.value })
+                  }
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  required
+                  className={`${inputClass} pl-10`}
+                />
+              </div>
             </div>
+          </div>
 
-            {/* Password */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label
-                  htmlFor="password"
-                  className="text-sm font-medium"
-                >
-                  Password
-                </label>
-
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="text-xs font-medium">
+                Password
+              </label>
+              <div className="relative">
+                <LockKeyhole className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   id="password"
-                  name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={form.password}
-                  onChange={handleChange}
-                  placeholder="••••••••"
+                  onChange={(event) =>
+                    setForm({ ...form, password: event.target.value })
+                  }
+                  placeholder="At least 6 characters"
+                  autoComplete="new-password"
                   required
-                  className="w-full rounded-lg border border-border bg-input px-4 py-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-ring"
+                  className={`${inputClass} pr-11 pl-10`}
                 />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="confirmPassword"
-                  className="text-sm font-medium"
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((value) => !value)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute top-1/2 right-3 grid size-7 -translate-y-1/2 place-items-center rounded-md text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  Confirm Password
-                </label>
-
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  value={form.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  required
-                  className="w-full rounded-lg border border-border bg-input px-4 py-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-ring"
-                />
+                  {showPassword ? (
+                    <EyeOff className="size-4" />
+                  ) : (
+                    <Eye className="size-4" />
+                  )}
+                </button>
               </div>
             </div>
 
-            {/* Role */}
-            <div className="space-y-3">
-              <label className="text-sm font-medium">
-                Account Type
+            <div className="space-y-1.5">
+              <label htmlFor="confirmPassword" className="text-xs font-medium">
+                Confirm password
               </label>
-
-              <div className="grid grid-cols-2 gap-3">
-                {/* Customer */}
-                <label
-                  className={`cursor-pointer rounded-lg border p-4 transition ${
-                    form.role === "customer"
-                      ? "border-primary bg-accent"
-                      : "border-border bg-input hover:border-muted-foreground"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value="customer"
-                    checked={form.role === "customer"}
-                    onChange={handleChange}
-                    className="sr-only"
-                  />
-
-                  <div className="font-medium">
-                    Customer
-                  </div>
-
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Find and request services
-                  </p>
-                </label>
-
-                {/* Technician */}
-                <label
-                  className={`cursor-pointer rounded-lg border p-4 transition ${
-                    form.role === "technician"
-                      ? "border-primary bg-accent"
-                      : "border-border bg-input hover:border-muted-foreground"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value="technician"
-                    checked={form.role === "technician"}
-                    onChange={handleChange}
-                    className="sr-only"
-                  />
-
-                  <div className="font-medium">
-                    Technician
-                  </div>
-
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Provide services to customers
-                  </p>
-                </label>
-              </div>
+              <input
+                id="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                value={form.confirmPassword}
+                onChange={(event) =>
+                  setForm({ ...form, confirmPassword: event.target.value })
+                }
+                placeholder="Repeat your password"
+                autoComplete="new-password"
+                required
+                className={inputClass}
+              />
             </div>
+          </div>
 
-            {/* Phone + Area */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label
-                  htmlFor="phone"
-                  className="text-sm font-medium"
-                >
-                  Phone
-                </label>
+          <p className="rounded-xl bg-secondary/40 px-3.5 py-2.5 text-[0.7rem] leading-relaxed text-muted-foreground">
+            Passwords need at least 6 characters, including one uppercase and
+            one lowercase letter.
+          </p>
 
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  value={form.phone}
-                  onChange={handleChange}
-                  placeholder="01XXXXXXXXX"
-                  required
-                  className="w-full rounded-lg border border-border bg-input px-4 py-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-ring"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="area"
-                  className="text-sm font-medium"
-                >
-                  Area
-                </label>
-
-                <input
-                  id="area"
-                  name="area"
-                  type="text"
-                  value={form.area}
-                  onChange={handleChange}
-                  placeholder="Mirpur, Dhaka"
-                  required
-                  className="w-full rounded-lg border border-border bg-input px-4 py-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-ring"
-                />
-              </div>
+          <div className="space-y-2">
+            <span className="text-xs font-medium">I want to join as</span>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {ROLES.map((role) => {
+                const active = form.role === role.value;
+                return (
+                  <button
+                    key={role.value}
+                    type="button"
+                    onClick={() => setForm({ ...form, role: role.value })}
+                    className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-colors ${
+                      active
+                        ? "border-primary bg-primary/8"
+                        : "border-border bg-input hover:border-primary/40"
+                    }`}
+                  >
+                    <span
+                      className={`grid size-9 shrink-0 place-items-center rounded-lg ${
+                        active
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-muted-foreground"
+                      }`}
+                    >
+                      <role.icon className="size-4" />
+                    </span>
+                    <span>
+                      <span className="block text-sm font-semibold">
+                        {role.label}
+                      </span>
+                      <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+                        {role.description}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
             </div>
+          </div>
 
-            {/* Bio */}
-            <div className="space-y-2">
-              <label
-                htmlFor="bio"
-                className="text-sm font-medium"
-              >
-                Bio
-                <span className="ml-2 text-xs text-muted-foreground">
-                  Optional
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label htmlFor="phone" className="text-xs font-medium">
+                Phone{" "}
+                <span className="font-normal text-muted-foreground">
+                  (optional)
                 </span>
               </label>
-
-              <textarea
-                id="bio"
-                name="bio"
-                value={form.bio}
-                onChange={handleChange}
-                placeholder="Tell us a little about yourself..."
-                rows={4}
-                className="w-full resize-none rounded-lg border border-border bg-input px-4 py-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-ring"
+              <input
+                id="phone"
+                type="tel"
+                value={form.phone}
+                onChange={(event) =>
+                  setForm({ ...form, phone: event.target.value })
+                }
+                placeholder="01XXXXXXXXX"
+                autoComplete="tel"
+                className={inputClass}
               />
             </div>
 
-            {/* Error */}
-            {error && (
-              <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                {error}
-              </div>
+            <div className="space-y-1.5">
+              <label htmlFor="area" className="text-xs font-medium">
+                Area{" "}
+                <span className="font-normal text-muted-foreground">
+                  (optional)
+                </span>
+              </label>
+              <input
+                id="area"
+                value={form.area}
+                onChange={(event) =>
+                  setForm({ ...form, area: event.target.value })
+                }
+                placeholder="Mirpur, Dhaka"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="bio" className="text-xs font-medium">
+              Bio{" "}
+              <span className="font-normal text-muted-foreground">
+                (optional)
+              </span>
+            </label>
+            <textarea
+              id="bio"
+              value={form.bio}
+              onChange={(event) =>
+                setForm({ ...form, bio: event.target.value })
+              }
+              placeholder="Tell customers or technicians a little about yourself."
+              rows={3}
+              className="w-full resize-none rounded-xl border border-border bg-input px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground/80 focus:border-primary focus:ring-1 focus:ring-ring/40"
+            />
+          </div>
+
+          {error && (
+            <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-xs text-destructive">
+              {error}
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            disabled={loading}
+            className="h-11 w-full rounded-xl font-semibold"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Creating account…
+              </>
+            ) : (
+              "Create account"
             )}
+          </Button>
 
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-lg bg-primary px-4 py-3 font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? "Creating account..." : "Create Account"}
-            </button>
-          </form>
-
-          {/* Login */}
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link
-              href="/sign-in"
-              className="font-medium text-primary hover:underline"
-            >
-              Log in
-            </Link>
+          <p className="text-center text-xs text-muted-foreground">
+            By creating an account you agree to FixMate&apos;s fair-use and
+            service policies.
           </p>
-        </div>
-      </div>
-    </main>
-  );
-};
+        </form>
 
-export default SignUpPage;
+        <p className="mt-5 border-t border-border pt-5 text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            href="/sign-in"
+            className="font-semibold text-primary hover:underline"
+          >
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
