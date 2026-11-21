@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-label="FixMate service placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#211D12"/>
+      <stop offset="1" stop-color="#0D0D0B"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E3C55B"/>
+      <stop offset="1" stop-color="#A88A2A"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#bg)"/>
+  <g fill="none" stroke="#302E29" stroke-width="1" opacity="0.7">
+    <path d="M0 100h640M0 200h640M0 300h640M160 0v400M320 0v400M480 0v400"/>
+  </g>
+  <circle cx="320" cy="200" r="86" fill="#C9A227" opacity="0.1"/>
+  <g transform="translate(320 200)" stroke="url(#gold)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M-42 -34a30 30 0 0 1 42 42l-14 14-42-42z"/>
+    <path d="M-14 22 22 58a14 14 0 0 0 20-20L6 2"/>
+  </g>
+  <text x="320" y="330" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" letter-spacing="4" fill="#9B978D">FIXMATE</text>
+</svg>

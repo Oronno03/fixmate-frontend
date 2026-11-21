@@ -18,7 +18,7 @@ import { ServiceCard } from "@/components/services/ServiceCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { serverFetch } from "@/lib/api-server";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, serviceImageSrc } from "@/lib/format";
 import type { Service } from "@/lib/types";
 
 export const instant = false;
@@ -65,7 +65,7 @@ export default async function ServiceDetailsPage({
         <div>
           <div className="relative aspect-[16/9] overflow-hidden rounded-3xl border border-border bg-secondary">
             <Image
-              src={service.image}
+              src={serviceImageSrc(service.image)}
               alt={service.title}
               fill
               priority

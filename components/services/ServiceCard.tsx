@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight, Clock, MapPin, Star, Wrench } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, serviceImageSrc } from "@/lib/format";
 import type { Service } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +28,7 @@ export function ServiceCard({
         className="relative block aspect-[16/10] overflow-hidden bg-secondary"
       >
         <Image
-          src={service.image}
+          src={serviceImageSrc(service.image)}
           alt={service.title}
           fill
           priority={priority}
