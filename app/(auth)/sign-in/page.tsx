@@ -20,7 +20,11 @@ import { ROLE_DASHBOARD } from "@/lib/constants";
 import type { Role } from "@/lib/types";
 
 const DEMO_ACCOUNTS = [
-  { label: "Customer", email: "customer@fixmate.com", password: "Customer@123" },
+  {
+    label: "Customer",
+    email: "customer@fixmate.com",
+    password: "Customer@123",
+  },
   { label: "Technician", email: "rahim@fixmate.com", password: "Tech@123" },
   { label: "Admin", email: "admin@fixmate.com", password: "Admin@123" },
 ];
@@ -173,30 +177,6 @@ function SignInForm() {
           >
             Create one
           </Link>
-        </p>
-      </div>
-
-      <div className="mt-5 rounded-2xl border border-border bg-card/60 p-4">
-        <p className="flex items-center gap-1.5 text-[0.65rem] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-          <ShieldCheck className="size-3.5 text-primary" />
-          Demo accounts
-        </p>
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          {DEMO_ACCOUNTS.map((account) => (
-            <button
-              key={account.label}
-              type="button"
-              onClick={() =>
-                setForm({ email: account.email, password: account.password })
-              }
-              className="rounded-lg border border-border bg-secondary/40 px-2 py-2 text-[0.7rem] font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-            >
-              {account.label}
-            </button>
-          ))}
-        </div>
-        <p className="mt-2 text-[0.68rem] leading-relaxed text-muted-foreground">
-          Tap a role to fill its credentials, then press Sign in.
         </p>
       </div>
     </div>
