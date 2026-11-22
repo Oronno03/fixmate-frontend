@@ -43,12 +43,20 @@ function Button({
   className,
   variant = "default",
   size = "default",
+  render,
+  nativeButton,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
   return (
     <ButtonPrimitive
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      render={render}
+      // A custom render element (for example a Next.js <Link>) is usually an
+      // anchor, not a native <button>. Defaulting this avoids Base UI's
+      // "expected a native button" warning while still allowing an explicit
+      // override for callers that render a real button element.
+      nativeButton={nativeButton ?? !render}
       {...props}
     />
   )
