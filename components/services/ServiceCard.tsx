@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Clock, MapPin, Star, Wrench } from "lucide-react";
+import { ArrowUpRight, Clock, MapPin, Wrench } from "lucide-react";
 
+import { RatingStars } from "@/components/shared/RatingStars";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, serviceImageSrc } from "@/lib/format";
 import type { Service } from "@/lib/types";
@@ -62,10 +63,11 @@ export function ServiceCard({
               {service.title}
             </Link>
           </h3>
-          <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-primary">
-            <Star className="size-3.5 fill-primary" />
-            4.9
-          </span>
+          <RatingStars
+            rating={service.ratingAverage}
+            count={service.ratingCount}
+            className="shrink-0"
+          />
         </div>
 
         <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">

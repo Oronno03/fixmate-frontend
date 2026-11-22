@@ -12,6 +12,8 @@ export type BookingStatus =
 
 export type PaymentStatus = "paid" | "unpaid";
 
+export type Plan = "free" | "pro";
+
 export type ServiceMode = "Home Visit" | "Shop Drop-off";
 
 export type Category =
@@ -29,6 +31,7 @@ export interface User {
   email: string;
   image?: string | null;
   role: Role;
+  plan?: Plan;
   phone?: string | null;
   area?: string | null;
   bio?: string | null;
@@ -55,8 +58,16 @@ export interface Service {
   };
   approvalStatus: ApprovalStatus;
   isAvailable: boolean;
+  ratingAverage?: number;
+  ratingCount?: number;
+  technicianPlan?: Plan;
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface StatusHistoryEntry {
+  status: BookingStatus;
+  changedAt: string;
 }
 
 export interface Booking {
@@ -75,8 +86,14 @@ export interface Booking {
   preferredDate: string;
   problemDescription: string;
   status: BookingStatus;
+  statusHistory?: StatusHistoryEntry[];
   finalAmount: number;
   paymentStatus: PaymentStatus;
+  paymentId?: string;
+  paidAt?: string | null;
+  rating?: number | null;
+  review?: string | null;
+  reviewedAt?: string | null;
   createdAt: string;
   updatedAt?: string;
 }
@@ -84,6 +101,8 @@ export interface Booking {
 export interface Payment {
   _id: string;
   bookingId: string;
+  kind?: "booking" | "subscription";
+  plan?: Plan;
   serviceTitle: string;
   customerName: string;
   customerEmail: string;
@@ -107,6 +126,15 @@ export interface AdminStats {
   bookingsByStatus: Array<{ _id: BookingStatus; count: number }>;
   revenueByMonth: Array<{ _id: string; total: number }>;
   servicesByCategory: Array<{ _id: Category; count: number }>;
+}
+
+export interface PaginationMeta {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
 }
 
 export interface ApiResponse<T> {

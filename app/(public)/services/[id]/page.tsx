@@ -9,12 +9,12 @@ import {
   Clock,
   MapPin,
   ShieldCheck,
-  Star,
   Wrench,
 } from "lucide-react";
 
 import { RequestServiceForm } from "@/components/services/RequestServiceForm";
 import { ServiceCard } from "@/components/services/ServiceCard";
+import { RatingStars } from "@/components/shared/RatingStars";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { serverFetch } from "@/lib/api-server";
@@ -95,10 +95,10 @@ export default async function ServiceDetailsPage({
                 <BadgeCheck className="size-3.5" />
                 Admin approved
               </Badge>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary">
-                <Star className="size-3.5 fill-primary" />
-                4.9 · 120+ repairs
-              </span>
+              <RatingStars
+                rating={service.ratingAverage}
+                count={service.ratingCount}
+              />
             </div>
 
             <h1 className="mt-3 font-heading text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
