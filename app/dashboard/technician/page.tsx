@@ -16,6 +16,7 @@ import {
   TableSkeleton,
 } from "@/components/dashboard/DataState";
 import { PageHeader } from "@/components/dashboard/PageHeader";
+import { ProPlanCard } from "@/components/dashboard/ProPlanCard";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { EmptyState } from "@/components/shared/EmptyState";
 import {
@@ -131,6 +132,8 @@ export default function TechnicianOverviewPage() {
           />
         </div>
       )}
+
+      <ProPlanCard serviceCount={services.length} />
 
       <div className="grid gap-5 lg:grid-cols-[1.4fr_0.6fr] lg:items-start">
         <div className="rounded-2xl border border-border bg-card">

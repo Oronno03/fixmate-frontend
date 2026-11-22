@@ -52,6 +52,12 @@ export const auth = betterAuth({
         type: "string",
         required: false,
       },
+      plan: {
+        type: "string",
+        required: false,
+        defaultValue: "free",
+        input: false,
+      },
     },
   },
   plugins: [jwt()],
