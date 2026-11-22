@@ -35,7 +35,7 @@ const socials = [
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-border bg-[#0D0D0B]">
+    <footer className="mt-auto border-t border-border bg-sidebar">
       <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-4">
           <Logo />

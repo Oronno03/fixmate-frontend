@@ -37,7 +37,7 @@ export function CustomerPayments() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-4 rounded-2xl border border-primary/25 bg-gradient-to-br from-[#211D12] via-card to-card p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-card to-card p-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <span className="grid size-11 place-items-center rounded-xl bg-primary text-primary-foreground">
             <CreditCard className="size-5" />

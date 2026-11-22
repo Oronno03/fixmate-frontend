@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { Logo } from "@/components/layout/Logo";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { clearApiTokenCache } from "@/lib/api";
@@ -141,7 +142,7 @@ export function DashboardShell({
 
   return (
     <div className="min-h-screen bg-background">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-border bg-[#0D0D0B] lg:block">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-border bg-sidebar lg:block">
         {sidebar}
       </aside>
 
@@ -153,7 +154,7 @@ export function DashboardShell({
             onClick={() => setOpen(false)}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
-          <aside className="absolute inset-y-0 left-0 w-72 border-r border-border bg-[#0D0D0B] shadow-2xl">
+          <aside className="absolute inset-y-0 left-0 w-72 border-r border-border bg-sidebar shadow-2xl">
             <button
               type="button"
               aria-label="Close menu"
@@ -188,6 +189,7 @@ export function DashboardShell({
           </div>
 
           <div className="ml-auto flex items-center gap-2">
+            <ThemeToggle />
             <Link
               href="/"
               className="hidden h-9 items-center gap-1.5 rounded-full border border-border px-3.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground sm:inline-flex"

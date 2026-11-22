@@ -193,7 +193,7 @@ export default function CustomerOverviewPage() {
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-2xl border border-primary/25 bg-gradient-to-br from-[#211D12] via-card to-card p-5">
+          <div className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-card to-card p-5">
             <p className="eyebrow">Payment</p>
             <h2 className="mt-2 font-heading text-lg font-semibold">
               Pay after completion

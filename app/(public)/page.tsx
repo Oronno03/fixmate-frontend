@@ -300,7 +300,7 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section className="border-y border-border bg-[#0D0D0B]">
+      <section className="border-y border-border bg-sidebar">
         <div className="container-page py-16 sm:py-20">
           <div className="max-w-2xl">
             <p className="eyebrow">How FixMate works</p>
@@ -397,7 +397,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-border bg-[#0D0D0B]">
+      <section className="border-y border-border bg-sidebar">
         <div className="container-page grid gap-12 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:py-20">
           <div>
             <p className="eyebrow">Why choose FixMate</p>
@@ -481,7 +481,7 @@ export default async function HomePage() {
       </section>
 
       <section className="container-page py-16 sm:py-20">
-        <div className="relative overflow-hidden rounded-3xl border border-primary/25 bg-gradient-to-br from-[#211D12] via-card to-card p-8 sm:p-12">
+        <div className="relative overflow-hidden rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/10 via-card to-card p-8 sm:p-12">
           <div className="pointer-events-none absolute -top-20 -right-16 size-64 rounded-full bg-primary/15 blur-3xl" />
           <div className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div>

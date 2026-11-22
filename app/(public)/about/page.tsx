@@ -97,7 +97,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="border-y border-border bg-[#0D0D0B]">
+      <section className="border-y border-border bg-sidebar">
         <div className="container-page grid gap-12 py-16 lg:grid-cols-2 lg:items-start">
           <div>
             <p className="eyebrow">Our story</p>
@@ -153,7 +153,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="border-y border-border bg-[#0D0D0B]">
+      <section className="border-y border-border bg-sidebar">
         <div className="container-page py-16">
           <div className="grid gap-10 lg:grid-cols-3">
             <div>
@@ -199,7 +199,7 @@ export default function AboutPage() {
       </section>
 
       <section className="container-page py-16">
-        <div className="relative overflow-hidden rounded-3xl border border-primary/25 bg-gradient-to-br from-[#211D12] via-card to-card p-8 sm:p-12">
+        <div className="relative overflow-hidden rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/10 via-card to-card p-8 sm:p-12">
           <div className="pointer-events-none absolute -top-24 -right-20 size-72 rounded-full bg-primary/15 blur-3xl" />
           <div className="relative max-w-2xl">
             <p className="eyebrow">Join the marketplace</p>

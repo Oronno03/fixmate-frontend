@@ -35,6 +35,7 @@ import type { Role } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 import { Logo } from "./Logo";
+import { ThemeToggle } from "./ThemeToggle";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -88,6 +89,7 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
+          <ThemeToggle />
           {isPending ? (
             <div className="h-9 w-36 animate-pulse rounded-full bg-secondary" />
           ) : user ? (
@@ -205,7 +207,14 @@ export function Navbar() {
               </Link>
             ))}
 
-            <div className="mt-3 border-t border-border pt-3">
+            <div className="mt-2 flex items-center justify-between px-3 py-2">
+              <span className="text-sm font-medium text-muted-foreground">
+                Appearance
+              </span>
+              <ThemeToggle />
+            </div>
+
+            <div className="mt-1 border-t border-border pt-3">
               {user ? (
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-3 px-3 py-2">

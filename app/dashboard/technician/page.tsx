@@ -236,7 +236,7 @@ export default function TechnicianOverviewPage() {
             </Button>
           </div>
 
-          <div className="rounded-2xl border border-primary/25 bg-gradient-to-br from-[#211D12] via-card to-card p-5">
+          <div className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-card to-card p-5">
             <p className="eyebrow">Pipeline</p>
             <h2 className="mt-2 font-heading text-lg font-semibold">
               Keep jobs moving
