@@ -8,6 +8,18 @@ const API_URL =
  * that do not depend on the current session.
  */
 export async function serverFetch<T>(path: string): Promise<T | null> {
+  const json = await serverFetchEnvelope<{ data?: T }>(path);
+  if (!json) return null;
+  return (json.data ?? json) as T;
+}
+
+/**
+ * Returns the complete JSON envelope. Use this when a response includes
+ * metadata alongside `data`, such as pagination details.
+ */
+export async function serverFetchEnvelope<T>(
+  path: string,
+): Promise<T | null> {
   try {
     const response = await fetch(`${API_URL}${path}`, {
       cache: "no-store",
@@ -15,8 +27,7 @@ export async function serverFetch<T>(path: string): Promise<T | null> {
 
     if (!response.ok) return null;
 
-    const json = (await response.json()) as { data?: T };
-    return json.data ?? (json as T);
+    return (await response.json()) as T;
   } catch {
     return null;
   }
