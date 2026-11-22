@@ -6,15 +6,18 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import {
   CheckCircle2,
   CreditCard,
+  Download,
   Loader2,
   Receipt,
   ShieldCheck,
   XCircle,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/api";
 import { formatCurrency } from "@/lib/format";
+import { downloadInvoice } from "@/lib/invoice";
 import type { Payment } from "@/lib/types";
 
 function PaymentSuccessContent() {
@@ -27,6 +30,7 @@ function PaymentSuccessContent() {
     sessionId ? "" : "Missing Stripe checkout session. Please contact support.",
   );
   const [loading, setLoading] = useState(Boolean(sessionId));
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     if (started.current || !sessionId) return;
@@ -45,6 +49,22 @@ function PaymentSuccessContent() {
       )
       .finally(() => setLoading(false));
   }, [sessionId]);
+
+  async function handleInvoice() {
+    if (!payment) return;
+    setDownloading(true);
+    try {
+      await downloadInvoice({ paymentId: payment._id });
+    } catch (downloadError) {
+      toast.error(
+        downloadError instanceof Error
+          ? downloadError.message
+          : "Could not download the invoice.",
+      );
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   return (
     <div className="w-full max-w-lg rounded-3xl border border-border bg-card p-7 text-center shadow-[0_30px_80px_-60px_rgba(0,0,0,0.9)] sm:p-9">
@@ -141,6 +161,19 @@ function PaymentSuccessContent() {
               render={<Link href="/dashboard/customer/bookings" />}
             >
               View my bookings
+            </Button>
+            <Button
+              variant="outline"
+              className="h-10 rounded-full px-5"
+              disabled={downloading}
+              onClick={handleInvoice}
+            >
+              {downloading ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Download className="size-4" />
+              )}
+              Invoice
             </Button>
             <Button
               variant="outline"

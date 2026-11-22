@@ -6,6 +6,7 @@ import {
   CalendarDays,
   ClipboardList,
   CreditCard,
+  Download,
   Eye,
   Loader2,
   MapPin,
@@ -51,6 +52,7 @@ import {
 import { useApi } from "@/hooks/use-api";
 import { apiFetch } from "@/lib/api";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { downloadInvoice } from "@/lib/invoice";
 import type { Booking } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -74,6 +76,7 @@ export function CustomerBookings() {
   const [cancelTarget, setCancelTarget] = useState<Booking | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [payingId, setPayingId] = useState<string | null>(null);
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
 
   const bookings = useMemo(() => data ?? [], [data]);
 
@@ -131,6 +134,21 @@ export function CustomerBookings() {
           : "Could not start the payment.",
       );
       setPayingId(null);
+    }
+  }
+
+  async function handleInvoice(booking: Booking) {
+    setDownloadingInvoice(true);
+    try {
+      await downloadInvoice({ bookingId: booking._id });
+    } catch (downloadError) {
+      toast.error(
+        downloadError instanceof Error
+          ? downloadError.message
+          : "Could not download the invoice.",
+      );
+    } finally {
+      setDownloadingInvoice(false);
     }
   }
 
@@ -386,6 +404,22 @@ export function CustomerBookings() {
                     Pay {formatCurrency(details.finalAmount)}
                   </Button>
                 )}
+
+              {details.paymentStatus === "paid" && (
+                <Button
+                  variant="outline"
+                  className="h-10 w-full rounded-xl"
+                  disabled={downloadingInvoice}
+                  onClick={() => handleInvoice(details)}
+                >
+                  {downloadingInvoice ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Download className="size-4" />
+                  )}
+                  Download invoice PDF
+                </Button>
+              )}
             </>
           )}
         </DialogContent>

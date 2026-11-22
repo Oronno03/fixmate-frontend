@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
-import { CreditCard, Receipt } from "lucide-react";
+import { useMemo, useState } from "react";
+import { CreditCard, Download, Loader2, Receipt } from "lucide-react";
+import { toast } from "sonner";
 
 import { DashboardError, TableSkeleton } from "@/components/dashboard/DataState";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -18,14 +19,31 @@ import {
 } from "@/components/ui/table";
 import { useApi } from "@/hooks/use-api";
 import { formatCurrency, formatDateTime } from "@/lib/format";
+import { downloadInvoice } from "@/lib/invoice";
 import type { Payment } from "@/lib/types";
 
 export function CustomerPayments() {
   const { data, error, isLoading, mutate } = useApi<Payment[]>(
     "/api/payments/my",
   );
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const payments = useMemo(() => data ?? [], [data]);
+
+  async function handleInvoice(payment: Payment) {
+    setDownloadingId(payment._id);
+    try {
+      await downloadInvoice({ paymentId: payment._id });
+    } catch (downloadError) {
+      toast.error(
+        downloadError instanceof Error
+          ? downloadError.message
+          : "Could not download the invoice.",
+      );
+    } finally {
+      setDownloadingId(null);
+    }
+  }
   const total = useMemo(
     () => payments.reduce((sum, payment) => sum + Number(payment.amount || 0), 0),
     [payments],
@@ -83,7 +101,8 @@ export function CustomerPayments() {
                 <TableHead>Transaction</TableHead>
                 <TableHead>Paid at</TableHead>
                 <TableHead>Amount</TableHead>
-                <TableHead className="pr-4">Status</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="pr-4 text-right">Invoice</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -105,8 +124,24 @@ export function CustomerPayments() {
                   <TableCell className="font-semibold">
                     {formatCurrency(payment.amount)}
                   </TableCell>
-                  <TableCell className="pr-4">
+                  <TableCell>
                     <PaymentStatusBadge status="paid" />
+                  </TableCell>
+                  <TableCell className="pr-4 text-right">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 rounded-full px-3 text-xs"
+                      disabled={downloadingId === payment._id}
+                      onClick={() => handleInvoice(payment)}
+                    >
+                      {downloadingId === payment._id ? (
+                        <Loader2 className="size-3.5 animate-spin" />
+                      ) : (
+                        <Download className="size-3.5" />
+                      )}
+                      PDF
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
