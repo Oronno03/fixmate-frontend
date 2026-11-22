@@ -12,12 +12,19 @@ export function proxy(request: NextRequest) {
 
   if (isProtected && !sessionCookie) {
     const url = new URL("/sign-in", request.url);
-    url.searchParams.set("redirect", pathname);
+    // Keep filters and page numbers so the user lands on the same view after
+    // signing in.
+    url.searchParams.set("redirect", `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(url);
   }
 
   if (isAuthPage && sessionCookie) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    const requested = request.nextUrl.searchParams.get("redirect");
+    const destination =
+      requested && requested.startsWith("/") && !requested.startsWith("//")
+        ? requested
+        : "/dashboard";
+    return NextResponse.redirect(new URL(destination, request.url));
   }
 
   return NextResponse.next();
