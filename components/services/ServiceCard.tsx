@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Clock, MapPin, Wrench } from "lucide-react";
+import { ArrowUpRight, Clock, Crown, MapPin, Wrench } from "lucide-react";
 
 import { RatingStars } from "@/components/shared/RatingStars";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +47,12 @@ export function ServiceCard({
           >
             {service.serviceMode}
           </Badge>
+          {service.technicianPlan === "pro" ? (
+            <Badge className="border-0 bg-primary text-primary-foreground">
+              <Crown className="size-3" />
+              Pro
+            </Badge>
+          ) : null}
         </div>
         <span className="absolute right-3 bottom-3 rounded-full bg-primary px-3 py-1 text-sm font-bold text-primary-foreground">
           {formatCurrency(service.basePrice)}

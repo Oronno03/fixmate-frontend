@@ -7,6 +7,7 @@ import {
   CalendarClock,
   CheckCircle2,
   Clock,
+  Crown,
   MapPin,
   ShieldCheck,
   Wrench,
@@ -175,9 +176,20 @@ export default async function ServiceDetailsPage({
                   </p>
                   <Badge
                     variant="outline"
-                    className="border-primary/30 bg-primary/8 text-primary"
+                    className={
+                      service.technicianPlan === "pro"
+                        ? "border-primary/40 bg-primary/10 text-primary"
+                        : "border-border text-muted-foreground"
+                    }
                   >
-                    Verified pro
+                    {service.technicianPlan === "pro" ? (
+                      <Crown className="size-3" />
+                    ) : (
+                      <BadgeCheck className="size-3" />
+                    )}
+                    {service.technicianPlan === "pro"
+                      ? "Verified Pro"
+                      : "Verified technician"}
                   </Badge>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
