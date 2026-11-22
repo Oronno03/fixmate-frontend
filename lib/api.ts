@@ -105,3 +105,45 @@ export async function apiFetch<T>(
 
   return (json?.data ?? json) as T;
 }
+
+/**
+ * Fetches a binary response (for example an invoice PDF) with the same bearer
+ * token handling and one-time refresh as {@link apiFetch}.
+ */
+export async function apiFetchBlob(
+  path: string,
+  options: ApiFetchOptions = {},
+): Promise<Blob> {
+  const { auth = true, ...init } = options;
+
+  const headers = new Headers(init.headers);
+  if (auth) {
+    headers.set("Authorization", `Bearer ${await getToken()}`);
+  }
+
+  let response = await fetch(`${API_URL}${path}`, {
+    ...init,
+    headers,
+    cache: "no-store",
+  });
+
+  if (response.status === 401 && auth) {
+    headers.set("Authorization", `Bearer ${await getToken(true)}`);
+    response = await fetch(`${API_URL}${path}`, {
+      ...init,
+      headers,
+      cache: "no-store",
+    });
+  }
+
+  if (!response.ok) {
+    const json = (await response.json().catch(() => null)) as ApiErrorBody | null;
+    throw new ApiError(
+      json?.message || "The download failed. Please try again.",
+      response.status,
+      json?.issues,
+    );
+  }
+
+  return response.blob();
+}
