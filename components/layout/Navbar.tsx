@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -115,46 +116,48 @@ export function Navbar() {
                   <ChevronDown className="size-3.5 text-muted-foreground" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-60">
-                  <DropdownMenuLabel className="px-2 py-2">
-                    <span className="block truncate text-sm font-semibold text-foreground">
-                      {user.name}
-                    </span>
-                    <span className="mt-0.5 block truncate text-xs font-normal text-muted-foreground">
-                      {user.email}
-                    </span>
-                    <span
-                      className={cn(
-                        "mt-2 inline-flex items-center rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold",
-                        ROLE_STYLES[role],
-                      )}
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel className="px-2 py-2">
+                      <span className="block truncate text-sm font-semibold text-foreground">
+                        {user.name}
+                      </span>
+                      <span className="mt-0.5 block truncate text-xs font-normal text-muted-foreground">
+                        {user.email}
+                      </span>
+                      <span
+                        className={cn(
+                          "mt-2 inline-flex items-center rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold",
+                          ROLE_STYLES[role],
+                        )}
+                      >
+                        {ROLE_LABELS[role]}
+                      </span>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="cursor-pointer gap-2 px-2 py-2"
+                      onClick={() => router.push(dashboardHref)}
                     >
-                      {ROLE_LABELS[role]}
-                    </span>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="cursor-pointer gap-2 px-2 py-2"
-                    onClick={() => router.push(dashboardHref)}
-                  >
-                    <LayoutDashboard className="size-4" />
-                    Dashboard
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer gap-2 px-2 py-2"
-                    onClick={() => router.push("/dashboard/profile")}
-                  >
-                    <UserRound className="size-4" />
-                    Update profile
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    variant="destructive"
-                    className="cursor-pointer gap-2 px-2 py-2"
-                    onClick={signOut}
-                  >
-                    <LogOut className="size-4" />
-                    Sign out
-                  </DropdownMenuItem>
+                      <LayoutDashboard className="size-4" />
+                      Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer gap-2 px-2 py-2"
+                      onClick={() => router.push("/dashboard/profile")}
+                    >
+                      <UserRound className="size-4" />
+                      Update profile
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      variant="destructive"
+                      className="cursor-pointer gap-2 px-2 py-2"
+                      onClick={signOut}
+                    >
+                      <LogOut className="size-4" />
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
