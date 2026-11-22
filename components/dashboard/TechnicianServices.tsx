@@ -44,7 +44,7 @@ import {
 } from "@/components/ui/table";
 import { useApi } from "@/hooks/use-api";
 import { apiFetch } from "@/lib/api";
-import { formatCurrency, formatDate } from "@/lib/format";
+import { formatCurrency, formatDate, serviceImageSrc } from "@/lib/format";
 import type { Service } from "@/lib/types";
 
 export function TechnicianServices() {
@@ -190,7 +190,7 @@ export function TechnicianServices() {
                       <div className="size-11 shrink-0 overflow-hidden rounded-lg border border-border bg-secondary">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={service.image}
+                          src={serviceImageSrc(service.image)}
                           alt={service.title}
                           className="size-full object-cover"
                         />
