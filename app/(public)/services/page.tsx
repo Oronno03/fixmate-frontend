@@ -4,11 +4,12 @@ import { SearchX, ShieldCheck, Sparkles } from "lucide-react";
 
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { ServiceFilters } from "@/components/services/ServiceFilters";
+import { ServicePagination } from "@/components/services/ServicePagination";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
-import { serverFetch } from "@/lib/api-server";
+import { serverFetchEnvelope } from "@/lib/api-server";
 import { CATEGORIES, SERVICE_MODES } from "@/lib/constants";
-import type { Service } from "@/lib/types";
+import type { PaginationMeta, Service } from "@/lib/types";
 
 export const instant = false;
 
@@ -40,18 +41,43 @@ export default async function ServicesPage({
     : "newest";
   const minPrice = first(params.minPrice) ?? "";
   const maxPrice = first(params.maxPrice) ?? "";
+  const parsedPage = Number(first(params.page) ?? 1);
+  const page =
+    Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const pageSize = 12;
 
-  const query = new URLSearchParams();
-  if (search) query.set("search", search);
-  if (category) query.set("category", category);
-  if (serviceMode) query.set("serviceMode", serviceMode);
-  if (sort) query.set("sort", sort);
-  if (minPrice) query.set("minPrice", minPrice);
-  if (maxPrice) query.set("maxPrice", maxPrice);
-  query.set("limit", "48");
+  const filterQuery = new URLSearchParams();
+  if (search) filterQuery.set("search", search);
+  if (category) filterQuery.set("category", category);
+  if (serviceMode) filterQuery.set("serviceMode", serviceMode);
+  if (sort) filterQuery.set("sort", sort);
+  if (minPrice) filterQuery.set("minPrice", minPrice);
+  if (maxPrice) filterQuery.set("maxPrice", maxPrice);
 
-  const services =
-    (await serverFetch<Service[]>(`/api/services?${query.toString()}`)) ?? [];
+  const query = new URLSearchParams(filterQuery);
+  query.set("page", String(page));
+  query.set("pageSize", String(pageSize));
+
+  const result = await serverFetchEnvelope<{
+    data: Service[];
+    pagination: PaginationMeta;
+  }>(`/api/services?${query.toString()}`);
+
+  const services = result?.data ?? [];
+  const pagination: PaginationMeta = result?.pagination ?? {
+    page,
+    pageSize,
+    total: services.length,
+    totalPages: 1,
+    hasNext: false,
+    hasPrev: false,
+  };
+  const rangeStart =
+    pagination.total === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1;
+  const rangeEnd = Math.min(
+    pagination.total,
+    pagination.page * pagination.pageSize,
+  );
 
   return (
     <>
@@ -94,10 +120,21 @@ export default async function ServicesPage({
 
         <div className="mt-8 flex items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">
-              {services.length}
-            </span>{" "}
-            {services.length === 1 ? "service" : "services"} found
+            {pagination.total > 0 ? (
+              <>
+                Showing{" "}
+                <span className="font-semibold text-foreground">
+                  {rangeStart}–{rangeEnd}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold text-foreground">
+                  {pagination.total}
+                </span>{" "}
+                {pagination.total === 1 ? "service" : "services"}
+              </>
+            ) : (
+              "No services found"
+            )}
             {search ? (
               <>
                 {" "}
@@ -117,15 +154,22 @@ export default async function ServicesPage({
         </div>
 
         {services.length > 0 ? (
-          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {services.map((service, index) => (
-              <ServiceCard
-                key={service._id}
-                service={service}
-                priority={index < 4}
-              />
-            ))}
-          </div>
+          <>
+            <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {services.map((service, index) => (
+                <ServiceCard
+                  key={service._id}
+                  service={service}
+                  priority={index < 4}
+                />
+              ))}
+            </div>
+            <ServicePagination
+              page={pagination.page}
+              totalPages={pagination.totalPages}
+              filterParams={filterQuery.toString()}
+            />
+          </>
         ) : (
           <div className="mt-5">
             <EmptyState

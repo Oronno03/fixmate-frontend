@@ -50,6 +50,8 @@ export function ServiceFilters() {
   function update(mutate: (params: URLSearchParams) => void) {
     const params = new URLSearchParams(searchParams.toString());
     mutate(params);
+    // Changing a filter starts a fresh result set, so drop any saved page.
+    params.delete("page");
     const query = params.toString();
     router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
   }
