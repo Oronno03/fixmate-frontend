@@ -8,17 +8,19 @@ import { toast } from "sonner";
 import { DashboardError } from "@/components/dashboard/DataState";
 import { ImageUpload } from "@/components/dashboard/ImageUpload";
 import { RoleBadge } from "@/components/shared/status-badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApi } from "@/hooks/use-api";
 import { apiFetch } from "@/lib/api";
-import type { Role } from "@/lib/types";
+import type { Plan, Role } from "@/lib/types";
 
 interface ProfileUser {
   _id: string;
   name: string;
   email: string;
   role: Role;
+  plan?: Plan;
   image?: string | null;
   phone?: string | null;
   area?: string | null;
@@ -137,8 +139,18 @@ function ProfileFormInner({
             {form.name || "Your name"}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">{user.email}</p>
-          <div className="mt-3">
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
             <RoleBadge role={user.role} />
+            <Badge
+              variant="outline"
+              className={
+                user.plan === "pro"
+                  ? "border-primary/40 bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground"
+              }
+            >
+              {user.plan === "pro" ? "Pro plan" : "Free plan"}
+            </Badge>
           </div>
         </div>
 
