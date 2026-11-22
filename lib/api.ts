@@ -6,6 +6,7 @@ export const API_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
+let tokenRequest: Promise<string> | null = null;
 
 export class ApiError extends Error {
   status: number;
@@ -23,11 +24,7 @@ export class ApiError extends Error {
   }
 }
 
-async function getToken(force = false) {
-  if (!force && cachedToken && cachedToken.expiresAt > Date.now()) {
-    return cachedToken.value;
-  }
-
+async function requestToken() {
   const response = await fetch("/api/auth/token", {
     credentials: "include",
     cache: "no-store",
@@ -53,8 +50,25 @@ async function getToken(force = false) {
   return cachedToken.value;
 }
 
+async function getToken(force = false) {
+  if (!force && cachedToken && cachedToken.expiresAt > Date.now()) {
+    return cachedToken.value;
+  }
+
+  // Several API calls can receive a 401 together. Share one token request
+  // instead of creating a burst of parallel token fetches.
+  if (!tokenRequest) {
+    tokenRequest = requestToken().finally(() => {
+      tokenRequest = null;
+    });
+  }
+
+  return tokenRequest;
+}
+
 export function clearApiTokenCache() {
   cachedToken = null;
+  tokenRequest = null;
 }
 
 interface ApiFetchOptions extends RequestInit {
