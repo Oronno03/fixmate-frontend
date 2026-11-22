@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+import { BookingReview } from "@/components/booking/BookingReview";
+import { BookingTimeline } from "@/components/booking/BookingTimeline";
 import { DashboardError, TableSkeleton } from "@/components/dashboard/DataState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import {
@@ -301,6 +303,20 @@ export function CustomerBookings() {
                 <BookingStatusBadge status={details.status} />
                 <PaymentStatusBadge status={details.paymentStatus} />
               </div>
+
+              <div className="rounded-xl border border-border bg-secondary/20 p-4">
+                <p className="mb-3 text-[0.65rem] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+                  Job timeline
+                </p>
+                <BookingTimeline booking={details} />
+              </div>
+
+              <BookingReview
+                booking={details}
+                onReviewed={() => {
+                  void mutate();
+                }}
+              />
 
               <div className="grid gap-3 rounded-xl border border-border bg-secondary/30 p-4 text-sm sm:grid-cols-2">
                 <div>
