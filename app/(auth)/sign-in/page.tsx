@@ -9,7 +9,6 @@ import {
   Loader2,
   LockKeyhole,
   Mail,
-  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -18,16 +17,6 @@ import { clearApiTokenCache } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 import { ROLE_DASHBOARD } from "@/lib/constants";
 import type { Role } from "@/lib/types";
-
-const DEMO_ACCOUNTS = [
-  {
-    label: "Customer",
-    email: "customer@fixmate.com",
-    password: "Customer@123",
-  },
-  { label: "Technician", email: "rahim@fixmate.com", password: "Tech@123" },
-  { label: "Admin", email: "admin@fixmate.com", password: "Admin@123" },
-];
 
 const inputClass =
   "h-11 w-full rounded-xl border border-border bg-input pl-10 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground/80 focus:border-primary focus:ring-1 focus:ring-ring/40";
